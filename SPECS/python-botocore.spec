@@ -22,13 +22,14 @@
 
 Name:           python-%{pypi_name}
 Version:        1.9.1
-Release:        2%{?dist}
+Release:        2%{?dist}.1
 Summary:        Low-level, data-driven core of boto 3
 
 License:        ASL 2.0
 URL:            https://github.com/boto/botocore
 Source0:        https://pypi.io/packages/source/b/%{pypi_name}/%{pypi_name}-%{version}.tar.gz
 Patch0:         botocore-1.5.3-fix_dateutil_version.patch
+Patch1:         RHEL-295858-botocore-use-system-ca-bundle-to-fix-CVEs.patch
 BuildArch:      noarch
 
 %description
@@ -37,6 +38,7 @@ botocore package is the foundation for the AWS CLI as well as boto3.
 
 %if %{with python2}
 %package -n     python2-%{pypi_name}
+Requires:       ca-certificates
 Summary:        Low-level, data-driven core of boto 3
 BuildRequires:  python2-devel
 BuildRequires:  python2-setuptools
@@ -118,6 +120,8 @@ Summary:        Documentation for %{name}
 sed -i -e '1 d' botocore/vendored/requests/packages/chardet/chardetect.py
 sed -i -e '1 d' botocore/vendored/requests/certs.py
 rm -rf %{pypi_name}.egg-info
+%patch1 -p1
+rm -f botocore/vendored/requests/cacert.pem
 # Remove online tests
 rm -rf tests/integration
 
@@ -182,6 +186,9 @@ nosetests-3.5 --with-coverage --cover-erase --cover-package botocore --with-xuni
 %endif # with docs
 
 %changelog
+* Thu Nov 05 2026 Arslan Ahmad <arahmad@redhat.com> - 1.9.1-2.1
+- Use system CA bundle from ca-certificates
+
 * Thu Jun 14 2018 Charalampos Stratakis <cstratak@redhat.com> - 1.9.1-2
 - Conditionalize the python2 subpackage
 

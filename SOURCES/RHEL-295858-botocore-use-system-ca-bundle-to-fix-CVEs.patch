@@ -1,0 +1,20 @@
+--- a/botocore/vendored/requests/certs.py	2026-11-05 19:45:55.020000000 +0530
++++ b/botocore/vendored/requests/certs.py	2026-11-06 00:38:05.883000000 +0530
+@@ -12,13 +12,15 @@
+ """
+ import os.path
+ 
++RHEL_CA_BUNDLE = "/etc/pki/ca-trust/extracted/pem/tls-ca-bundle.pem"
++
+ try:
+     from certifi import where
+ except ImportError:
+     def where():
+         """Return the preferred certificate bundle."""
+-        # vendored bundle inside Requests
+-        return os.path.join(os.path.dirname(__file__), 'cacert.pem')
++        # system CA bundle from ca-certificates
++        return RHEL_CA_BUNDLE
+ 
+ if __name__ == '__main__':
+     print(where())
